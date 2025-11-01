@@ -1,0 +1,14 @@
+#login-form {
+    input {
+        height: 40px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+}
+
+#login-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
