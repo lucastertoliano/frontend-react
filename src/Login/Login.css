@@ -4,7 +4,9 @@
         border-radius: 5px;
         border: 1px solid #ccc;
         width: 100%;
-        background-color: rgb(255, 255, 255, 0.9);
+        background-color: white(255, 255, 255, 0.9);
+        margin-bottom: 0.5rem;
+
     }
 }
 
@@ -22,13 +24,25 @@
 #left-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     justify-content: center;
     height: 100%;
     width: 35vw;
+    padding-left: 2rem;
     
     .title {
         color: #15A69F;
+    }
+}
+.icon-container{
+    button{
+        color: #15A69F;
+        cursor: pointer;
+        margin-right: 1rem;
+        background-color: transparent;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
     }
 }
 
@@ -42,15 +56,33 @@
     border-radius: 0px 15px 15px 0px;
 
     .welcome-title {
+        font-size: 2rem;
         color: #FFF;
+    }
+    .welcome-message{
+        color: #FFF;
+        margin-bottom: 2rem;
+        font-size: 1.5rem;
     }
 }
 
 button[type='submit'] {
-    margin-top: 20px;
-    background-color: transparent;
+ 
     color: #FFF;
     border: 1px solid #FFF;
     font-weight: bold;
-    width: 80%;
+    width: 60%;
+    background-color: #15A69F;
+}
+.forgot-password-container{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+    width: 100%;
+    a{
+        color: #15A69F;
+        font-size: 0.9rem;
+        text-decoration: none;
+    }
 }
