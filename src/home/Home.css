@@ -1,0 +1,25 @@
+#home-bar {
+    background-color: #15a69f;
+    overflow: hidden;
+    color: white;
+    padding: 14px 16px;
+    font-size: 18px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
+}
+
+.avatar {
+    img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        float: right;
+        margin-left: 10px;
+    }
+    width: 40px;
+    height: 40px;
+    border: 1px solid #000;
+}
