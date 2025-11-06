@@ -5,9 +5,11 @@ const Home = () => {
     <nav id="home-bar">
         <div className='links'>
             <a href="/home">Home</a>
-            <a href="/about">About</a>
-            <a href="/sign-up">Sign Up</a>
-            <a href="/login">Logout</a>
+            <a href="/gerenciamentoProduto">Produtos</a>
+            <a href="/promocao">Promoção</a>
+            <a href="/gerenciamentoUsuario">Usuários</a>
+            <a href="/detalhesUsuario">Detalhes dos Usuários</a>
+            <a href="/login">Sair</a>
         </div>
         <div className='user-info'>
           <div className='avatar'>
