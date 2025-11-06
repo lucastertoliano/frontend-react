@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
-import Login from './login/Login.tsx'
+import Login from './Login/Login.tsx'
 import Home from './home/Home.tsx'
 import About from './about/About.tsx'
 import ForgotPassword from './forgot-password/ForgotPassword.tsx'
