@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import './Login.css'
 import { useNavigate } from 'react-router-dom';
+import fruta from '../assets/carrinhoFruta.png';
+import logo from '../assets/logo.png';
+
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,18 +22,9 @@ const Login = () => {
   return (
     <div id="login-container">
         <div id="left-container">
-            <h2 className='title'>Sign In to Developer</h2>
-        <div className='icon-container'>
-            <button>
-              <i className="fab fa-facebook-f"></i>
-            </button>
-            <button>
-              <i className="fab fa-instagram"></i>
-            </button>
-            <button>
-              <i className="fab fa-linkedin-in"></i>
-            </button>
-        </div>
+            <img src={logo} alt="logo" title='logo'/>
+            <h2 className='title'>Acesse sua conta</h2>
+      
             <form id="login-form" onSubmit={(e) => {sendRequest(e)}}>
                 <input type="email" id="username" placeholder="Usuário" onChange ={(e) => {setEmail(e.target.value)}}/> 
                 <input type="password" id="password" placeholder="Senha" onChange ={(e) => {setPassword(e.target.value)}}/>
@@ -42,9 +36,10 @@ const Login = () => {
             </form>
         </div>
         <div id="right-container">
-            <h2 className="welcome-title">Seja bem vindo!</h2>
-            <p className='welcome-message'>Para continuar, faça seu login</p>
-            <button onClick={() => navigation("/sign-up")} type="submit">Sign up</button>
+            <img src={fruta} alt="fruta" title='fruta'/>
+            <h2 className="welcome-title">Ainda não tem conta?</h2>
+            <p className='welcome-message'>Cadastre-se e aproveite as ofertas!</p>
+            <button onClick={() => navigation("/sign-up")} type="submit">Criar conta</button>
         </div>
     </div>
   )
