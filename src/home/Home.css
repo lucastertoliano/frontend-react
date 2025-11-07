@@ -1,7 +1,7 @@
 #home-bar {
-    background-color: #FEE600;
+    background-color: #15a69f;
     overflow: hidden;
-    color: darkblue;
+    color: white;
     padding: 14px 16px;
     font-size: 18px;
     width: 100%;
@@ -9,8 +9,6 @@
     top: 0;
     left: 0;
     box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
 
     display: flex;
     flex-direction: row;
@@ -50,7 +48,7 @@
     justify-content: center;
     align-items: center;
     a {
-        color: darkblue;
+        color: white;
         margin-right: 20px;
         text-decoration: none;
         font-size: 20px;
