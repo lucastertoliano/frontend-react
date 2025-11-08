@@ -16,7 +16,7 @@ const Login = () => {
           alert("Por favor, preencha todos os campos.");
           return;
       }
-      navigation('/home');
+      navigation('/homeLayout');
 
   }
   return (
