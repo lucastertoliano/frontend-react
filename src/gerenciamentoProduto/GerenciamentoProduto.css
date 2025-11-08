@@ -3,11 +3,9 @@
   color: darkblue;
   text-align: center;
 }
-
 h2 {
   margin-bottom: 20px;
 }
-
 .form-produto {
   display: flex;
   flex-wrap: wrap;
@@ -15,13 +13,11 @@ h2 {
   gap: 10px;
   margin-bottom: 30px;
 }
-
 .form-produto input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 6px;
 }
-
 .form-produto button {
   background-color: #fee600;
   border: none;
@@ -30,25 +26,21 @@ h2 {
   cursor: pointer;
   font-weight: 600;
 }
-
 table {
   width: 90%;
   margin: 0 auto;
   border-collapse: collapse;
   background-color: white;
 }
-
 th,
 td {
   border: 1px solid #ddd;
   padding: 8px;
 }
-
 th {
   background-color: #fee600;
   color: darkblue;
 }
-
 .editar,
 .remover {
   border: none;
@@ -57,12 +49,10 @@ th {
   border-radius: 5px;
   cursor: pointer;
 }
-
 .editar {
   background-color: darkblue;
   color: white;
 }
-
 .remover {
   background-color: gray;
   color: white;
