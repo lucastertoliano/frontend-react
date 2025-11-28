@@ -3,13 +3,20 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose'
+
+mongoose.connect('mongodb://127.0.0.1:27017/mercado-system')
+.then(() => console.log('✅ MongoDB Conectado com Sucesso!'))
+    .catch(err => {
+    console.error('❌ ERRO NA CONEXÃO COM O MONGODB:', err.message);
+    });
 
 dotenv.config();
 
-import usersRoutes from './routes/usersRoutes.js';
-import productsRoutes from './routes/productsRoutes.js';
-import promotionsRoutes from './routes/promotionsRoutes.js';
-import equipmentRoutes from "./routes/EquipmentRoutes.js";
+import usersRouter from './router/user-router.js';
+import productsRouter from './router/productsRouter.js';
+import promotionsRouter from './router/promotionsRouter.js';
+import EquipmentRouter from "./router/EquipmentRouter.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,12 +26,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/api/user',usersRouter)
 
 //rotas api
-app.use('/api/users', usersRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/promotions', promotionsRoutes);
-app.use('/api/equipment', equipmentRoutes);
+app.use('/api/users', usersRouter);
+app.use('/api/products', productsRouter);
+app.use('/api/promotions', promotionsRouter);
+app.use('/api/equipment', EquipmentRouter);
 
 // rota
 app.get('/', (req, res) => {
