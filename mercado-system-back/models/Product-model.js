@@ -7,7 +7,6 @@ const ProductSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    //Preço Atual
     currentPrice: { 
         type: Number,
         required: true,
@@ -27,10 +26,15 @@ const ProductSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    //Data de validade
     expirationDate: { 
         type: Date,
         required: true
+    },
+    quantity: {
+        type: Number,
+        required: true, 
+        default: 0,
+        min: 0
     }
 }, {
     timestamps: true

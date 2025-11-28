@@ -5,7 +5,7 @@ import fruta from '../assets/carrinhoFruta.png';
 import logo from '../assets/logo.png';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3001/api/users/login'; 
+const API_URL = 'http://localhost:3001/api/user/login'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');

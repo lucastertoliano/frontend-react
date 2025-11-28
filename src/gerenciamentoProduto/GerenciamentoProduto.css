@@ -57,3 +57,9 @@ th {
   background-color: gray;
   color: white;
 }
+.form-produto input {
+    width: 150px; 
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
