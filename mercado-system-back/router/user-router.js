@@ -11,14 +11,15 @@ router.post("/", UserController.createUser);
 router.post(
     "/profile/upload", 
     authenticateToken, 
+    upload.single('profilePicture'),
     UserController.uploadProfilePicture
-    );
+);
 
 router.use(authenticateToken); 
+
 router.get("/", UserController.getAllUsers);
 router.get("/:id", UserController.getUserById);
 router.put("/:id", UserController.updateUser);
 router.delete("/:id", UserController.deleteUser);
-router.post("/login", UserController.loginUser);
 
 export default router;
