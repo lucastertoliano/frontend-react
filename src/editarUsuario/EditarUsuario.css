@@ -1,0 +1,113 @@
+/* Estilos Base para o Container */
+.editar-usuario-container {
+    padding: 30px;
+    color: darkblue; /* Texto principal em azul escuro */
+    text-align: center;
+    max-width: 600px; /* Limita a largura do container para centralizar */
+    margin: 50px auto; /* Centraliza o bloco na página, com margem superior */
+    background-color: white; /* Fundo branco para o formulário */
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra para destacar */
+}
+
+/* Estilo para o Título */
+.editar-usuario-container h2 {
+    margin-bottom: 30px;
+    color: darkblue;
+    font-size: 1.8rem;
+    border-bottom: 3px solid #fee600; /* Linha amarela sob o título */
+    padding-bottom: 10px;
+    display: inline-block; /* Ajusta a linha amarela ao tamanho do texto */
+}
+
+/* Estilo para o Formulário */
+.editar-usuario-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Estica os elementos do formulário (labels e inputs) */
+    gap: 15px; /* Espaço entre os elementos */
+    text-align: left;
+}
+
+/* Estilo para Labels */
+.editar-usuario-container label {
+    font-weight: bold;
+    color: darkblue;
+    margin-top: 5px;
+}
+
+/* Estilo para Inputs */
+.editar-usuario-container input {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    width: 100%; /* Ocupa a largura total dentro do formulário */
+    box-sizing: border-box; /* Garante que padding e border não aumentem a largura total */
+    transition: border-color 0.2s;
+}
+
+.editar-usuario-container input:focus {
+    border-color: #fee600; /* Borda amarela ao focar */
+    outline: none;
+}
+
+/* Estilos para os Botões */
+.editar-usuario-container button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+    margin-top: 10px;
+}
+
+/* Estilo para o Botão "Salvar Alterações" (Principal) */
+.editar-usuario-container form button[type="submit"] {
+    background-color: darkblue; /* Cor principal, DarkBlue */
+    color: white;
+}
+
+.editar-usuario-container form button[type="submit"]:hover {
+    background-color: #0047b3; /* Um azul um pouco mais claro no hover */
+}
+
+/* Estilo para o Botão "Cancelar" */
+.editar-usuario-container .btn-cancelar {
+    background-color: #f2f2f2; /* Cinza claro */
+    color: #555;
+    margin-left: 10px;
+    width: auto; /* Permite que o botão se ajuste ao conteúdo, se for colocado lado a lado */
+}
+
+.editar-usuario-container .btn-cancelar:hover {
+    background-color: #ddd;
+}
+
+/* Organização dos botões: lado a lado no final do formulário */
+.editar-usuario-container form {
+    /* ... outras propriedades de form ... */
+    position: relative; /* Para posicionar o grupo de botões */
+}
+
+.editar-usuario-container button {
+    /* Faz os botões ficarem lado a lado, se houver espaço */
+    margin-right: 10px; 
+    display: inline-block;
+}
+.editar-usuario-container form > button:last-of-type {
+    background-color: #f2f2f2; 
+    color: darkblue;
+}
+.editar-usuario-container button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.button-group {
+    display: flex;
+    justify-content: flex-end; 
+    gap: 15px; 
+    margin-top: 20px;
+}

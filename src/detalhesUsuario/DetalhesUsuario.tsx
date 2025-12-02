@@ -1,77 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import "./detalhesUsuario.css";
 
+const API_URL = 'http://localhost:3001/api/users'; 
+
 const DetalhesUsuario = () => {
-  const [usuarios, setUsuarios] = useState([
-    {
-      nome: "João Silva",
-      cargo: "Caixa",
-      email: "joao@empresa.com",
-      telefone: "(11) 99999-8888",
-      cpf: "123.456.789-00",
-      dataAdmissao: "2022-03-15",
-      nivel: "Comum",
-      status: "Ativo",
-    },
-    {
-      nome: "Maria Souza",
-      cargo: "Gerente",
-      email: "maria@empresa.com",
-      telefone: "(11) 98888-7777",
-      cpf: "987.654.321-00",
-      dataAdmissao: "2021-09-02",
-      nivel: "Admin",
-      status: "Ativo",
-    },
-    {
-      nome: "Carlos Pereira",
-      cargo: "Repositor",
-      email: "carlos@empresa.com",
-      telefone: "(11) 97777-6666",
-      cpf: "456.789.123-00",
-      dataAdmissao: "2023-01-10",
-      nivel: "Comum",
-      status: "Inativo",
-    },
-  ]);
+    const { id } = useParams<{ id: string }>(); 
+    const navigate = useNavigate();
 
-  return (
-    <div className="detalhes-usuarios">
-      <h2>Detalhes dos Funcionários</h2>
+    const [usuario, setUsuario] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Cargo</th>
-            <th>Email</th>
-            <th>Telefone</th>
-            <th>CPF</th>
-            <th>Data de Admissão</th>
-            <th>Nível</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.map((usuario, index) => (
-            <tr
-              key={index}
-              className={usuario.status === "Inativo" ? "inativo" : ""}
+    const fetchUser = async () => {
+        const token = localStorage.getItem('jwtToken'); 
+        
+        if (!token || !id) {
+            setLoading(false);
+            return;
+        }
+
+        try {
+            const response = await axios.get(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setUsuario(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar detalhes do usuário:', error);
+            setUsuario(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, [id]); 
+
+    if (loading) {
+        return <div className="detalhes-usuarios">Carregando detalhes do funcionário...</div>;
+    }
+
+    if (!usuario) {
+        return <div className="detalhes-usuarios">Funcionário não encontrado ou não autorizado.</div>;
+    }
+
+    const dataCriacao = usuario.createdAt ? new Date(usuario.createdAt).toLocaleDateString("pt-BR") : 'N/A';
+
+    return (
+        <div className="detalhes-usuarios">
+            <h2>Detalhes do Funcionário</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>CPF</th>
+                        <th>Identificador/Cargo</th>
+                        <th>Status</th>
+                        <th>Data Criação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr className={usuario.status === "Inativo" ? "inativo" : ""}>
+                        <td>{usuario.name}</td>
+                        <td>{usuario.email}</td>
+                        <td>{usuario.cpf}</td>
+                        <td>{usuario.identifier || 'Não Definido'}</td>
+                        <td>Ativo</td> 
+                        <td>{dataCriacao}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            {}
+            <button 
+                className="btn-editar-usuario"
+                onClick={() => navigate(`/editarUsuario/${id}`)}
             >
-              <td>{usuario.nome}</td>
-              <td>{usuario.cargo}</td>
-              <td>{usuario.email}</td>
-              <td>{usuario.telefone}</td>
-              <td>{usuario.cpf}</td>
-              <td>{new Date(usuario.dataAdmissao).toLocaleDateString("pt-BR")}</td>
-              <td>{usuario.nivel}</td>
-              <td>{usuario.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+                Editar Usuário
+            </button>
+
+        </div>
+    );
 };
 
 export default DetalhesUsuario;

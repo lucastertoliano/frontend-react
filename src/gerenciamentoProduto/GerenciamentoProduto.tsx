@@ -1,61 +1,139 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import './GerenciamentoProduto.css';
 
-const API_URL = 'http://localhost:3001/api/products'; 
+const API_URL = 'http://localhost:3001/api/products';
 
 const GerenciamentoProduto = () => {
-
     const [nome, setNome] = useState('');
     const [precoAtual, setPrecoAtual] = useState('');
     const [tipo, setTipo] = useState('');
-    const [descricao, setDescricao] = useState(''); 
+    const [descricao, setDescricao] = useState('');
     const [dataValidade, setDataValidade] = useState('');
     const [quantidade, setQuantidade] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); 
+    const [produtos, setProdutos] = useState([]);
+    const [produtoEmEdicao, setProdutoEmEdicao] = useState<any>(null);
 
-        const token = localStorage.getItem('jwtToken'); 
+    const fetchProducts = async () => {
+        const token = localStorage.getItem('jwtToken');
+        if (!token) return;
 
+        try {
+            const response = await axios.get(API_URL, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setProdutos(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchProducts();
+    }, []);
+
+    const handleEdit = (produto: any) => {
+        setProdutoEmEdicao(produto);
+
+        setNome(produto.name);
+        setPrecoAtual(produto.currentPrice.toString());
+        setTipo(produto.type);
+        setDescricao(produto.description);
+        setQuantidade(produto.quantity.toString());
+
+        const dataIso = new Date(produto.expirationDate).toISOString().split('T')[0];
+        setDataValidade(dataIso);
+    };
+
+    const handleCancelEdit = () => {
+        setProdutoEmEdicao(null);
+        setNome(''); setPrecoAtual(''); setTipo(''); setDescricao('');
+        setDataValidade(''); setQuantidade('');
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!window.confirm(`Tem certeza que deseja remover o produto "${name}"?`)) {
+            return;
+        }
+
+        const token = localStorage.getItem('jwtToken');
         if (!token) {
             alert("Sessão expirada. Faça login novamente.");
             return;
         }
 
         try {
+            await axios.delete(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert(`Produto ${name} removido com sucesso!`);
+            fetchProducts();
+        } catch (error: any) {
+            console.error('Erro ao remover:', error);
+            const msg = error.response?.data?.message || 'Falha ao remover o produto.';
+            alert(`Erro: ${msg}`);
+        }
+    };
+
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const token = localStorage.getItem('jwtToken');
+
+        if (!token) {
+            alert("Sessão expirada. Faça login novamente.");
+            return;
+        }
+
+        const precoNumerico = parseFloat(precoAtual);
+        const quantidadeNumerica = parseInt(quantidade);
+
+        if (isNaN(precoNumerico) || isNaN(quantidadeNumerica)) {
+            alert("Por favor, insira valores válidos para Preço e Quantidade.");
+            return;
+        }
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(dataValidade)) {
+            alert("Por favor, selecione a Data de Validade usando o seletor (YYYY-MM-DD).");
+            return;
+        }
+
+        try {
             const productData = {
                 name: nome,
-                currentPrice: parseFloat(precoAtual),
+                currentPrice: precoNumerico,
                 type: tipo,
                 description: descricao,
                 expirationDate: dataValidade,
-                quantity: parseInt(quantidade),
+                quantity: quantidadeNumerica,
             };
 
-            const response = await axios.post(
-                API_URL, 
-                productData,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                }
-            );
+            let response;
 
-            alert(`Produto ${response.data.product.name} cadastrado com sucesso!`);
+            if (produtoEmEdicao) {
+                const url = `${API_URL}/${produtoEmEdicao._id}`;
+                response = await axios.put(url, productData, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                alert(`Produto ${response.data.product.name} atualizado com sucesso!`);
+            } else {
+                response = await axios.post(API_URL, productData, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                alert(`Produto ${response.data.product.name} cadastrado com sucesso!`);
+            }
 
-            setNome('');
-            setPrecoAtual('');
-            setTipo('');
-            setDescricao('');
-            setDataValidade('');
-            setQuantidade('');
+            fetchProducts();
+            handleCancelEdit();
 
         } catch (error: any) {
-            console.error('Erro no cadastro:', error);
-            const msg = error.response?.data?.message || 'Falha ao conectar com a API ou token inválido.';
-            alert(`Erro ao cadastrar: ${msg}`);
+            console.error('Erro na submissão:', error);
+            const msg = error.response?.data?.message || 'Falha na requisição.';
+            alert(`Erro: ${msg}`);
         }
     };
 
@@ -63,17 +141,23 @@ const GerenciamentoProduto = () => {
         <div className="produtos">
             <h2>Gerenciamento de Produtos</h2>
 
-            <form onSubmit={handleSubmit} className="form-produto"> 
+            <form onSubmit={handleSubmit} className="form-produto">
+                {produtoEmEdicao && (
+                    <button type="button" onClick={handleCancelEdit} style={{ backgroundColor: '#e74c3c', color: 'white' }}>
+                        Cancelar Edição
+                    </button>
+                )}
+
                 <input type="text" placeholder="Nome do Produto" value={nome} onChange={e => setNome(e.target.value)} required />
                 <input type="number" placeholder="Preço Atual (R$)" value={precoAtual} onChange={e => setPrecoAtual(e.target.value)} required />
                 <input type="text" placeholder="Tipo" value={tipo} onChange={e => setTipo(e.target.value)} required />
-                <input type="text" placeholder="Descrição" value={descricao} onChange={e => setDescricao(e.target.value)} required /> 
+                <input type="text" placeholder="Descrição" value={descricao} onChange={e => setDescricao(e.target.value)} required />
                 <input type="date" placeholder="Data de Validade" value={dataValidade} onChange={e => setDataValidade(e.target.value)} required />
-                
-                {}
-                <input type="number" placeholder="Quantidade em Estoque" value={quantidade} onChange={e => setQuantidade(e.target.value)} required /> 
-                
-                <button type="submit">Salvar</button> 
+                <input type="number" placeholder="Quantidade em Estoque" value={quantidade} onChange={e => setQuantidade(e.target.value)} required />
+
+                <button type="submit">
+                    {produtoEmEdicao ? 'Atualizar' : 'Salvar'}
+                </button>
             </form>
 
             <h3>Estoque</h3>
@@ -90,61 +174,35 @@ const GerenciamentoProduto = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Azeite de Oliva Extra Virgem 250ml</td>
-                        <td>R$ 16,90</td>
-                        <td>Alimento</td>
-                        <td>18</td>
-                        <td>10/04/2027</td>
-                        <td>
-                            <button className="editar">Editar</button>
-                            <button className="remover">Remover</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Farofa Pronta Zaeli Tradicional</td>
-                        <td>R$ 6,99</td>
-                        <td>Alimento</td>
-                        <td>10</td>
-                        <td>12/12/2027</td>
-                        <td>
-                            <button className="editar">Editar</button>
-                            <button className="remover">Remover</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Biscoito Rosquinha</td>
-                        <td>R$ 3,59</td>
-                        <td>Alimento</td>
-                        <td>33</td>
-                        <td>07/02/2026</td>
-                        <td>
-                            <button className="editar">Editar</button>
-                            <button className="remover">Remover</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Suco de Uva Tinto Aliança</td>
-                        <td>R$ 16,90</td>
-                        <td>Bebida</td>
-                        <td>2</td>
-                        <td>11/01/2026</td>
-                        <td>
-                            <button className="editar">Editar</button>
-                            <button className="remover">Remover</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Coca-Cola 2l</td>
-                        <td>R$ 11,90</td>
-                        <td>Bebida</td>
-                        <td>51</td>
-                        <td>15/05/2027</td>
-                        <td>
-                            <button className="editar">Editar</button>
-                            <button className="remover">Remover</button>
-                        </td>
-                    </tr>
+                    {produtos.map((produto: any) => (
+                        <tr key={produto._id}>
+                            <td>{produto.name}</td>
+                            <td>
+                                R$ {produto.promotionPrice
+                                    ? produto.promotionPrice.toFixed(2).replace('.', ',')
+                                    : produto.currentPrice.toFixed(2).replace('.', ',')}
+                                {}
+                                {produto.promotionPrice && <span style={{ fontSize: '0.8em', color: 'red' }}> (PROMO)</span>}
+                            </td>
+                            <td>{produto.type}</td>
+                            <td>{produto.quantity}</td>
+                            <td>{new Date(produto.expirationDate).toLocaleDateString('pt-BR')}</td>
+                            <td>
+                                <button
+                                    className="editar"
+                                    onClick={() => handleEdit(produto)}
+                                >
+                                    Editar
+                                </button>
+                                <button
+                                    className="remover"
+                                    onClick={() => handleDelete(produto._id, produto.name)}
+                                >
+                                    Remover
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </div>

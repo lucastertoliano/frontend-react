@@ -1,131 +1,171 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import "./gerenciamentoUsuario.css";
 
+const API_URL = 'http://localhost:3001/api/users';
+
 const GerenciamentoUsuario = () => {
-  const [usuarios, setUsuarios] = useState([
-    { nome: "João Silva", cargo: "Caixa", email: "joao@empresa.com", nivel: "Comum", status: "Ativo" },
-    { nome: "Maria Souza", cargo: "Gerente", email: "maria@empresa.com", nivel: "Admin", status: "Ativo" },
-  ]);
-
-  const [novoUsuario, setNovoUsuario] = useState({
-    nome: "",
-    cargo: "",
-    email: "",
-    nivel: "Comum",
-    status: "Ativo",
-  });
-
-  const [editandoIndex, setEditandoIndex] = useState(null);
-
-  const handleChange = (e) => {
-    setNovoUsuario({
-      ...novoUsuario,
-      [e.target.name]: e.target.value,
+    const navigate = useNavigate(); 
+    
+    const [usuarios, setUsuarios] = useState<any[]>([]);
+    
+    const [novoUsuario, setNovoUsuario] = useState({
+        name: "",
+        email: "",
+        password: "",
+        cpf: "",
+        identifier: "",
     });
-  };
 
-  const adicionarUsuario = () => {
-    if (!novoUsuario.nome || !novoUsuario.cargo || !novoUsuario.email) return;
-    setUsuarios([...usuarios, novoUsuario]);
-    setNovoUsuario({ nome: "", cargo: "", email: "", nivel: "Comum", status: "Ativo" });
-  };
+    const fetchUsers = async () => {
+        const token = localStorage.getItem('jwtToken'); 
+        if (!token) return;
 
-  const editarUsuario = (index) => {
-    setEditandoIndex(index);
-    setNovoUsuario(usuarios[index]);
-  };
+        try {
+            const response = await axios.get(API_URL, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setUsuarios(response.data);
+        } catch (error) {
+            console.error('Erro ao buscar usuários:', error);
+        }
+    };
 
-  const salvarEdicao = () => {
-    const listaAtualizada = usuarios.map((u, i) => (i === editandoIndex ? novoUsuario : u));
-    setUsuarios(listaAtualizada);
-    setEditandoIndex(null);
-    setNovoUsuario({ nome: "", cargo: "", email: "", nivel: "Comum", status: "Ativo" });
-  };
+    useEffect(() => {
+        fetchUsers();
+    }, []); 
 
-  const removerUsuario = (index) => {
-    const novaLista = usuarios.filter((_, i) => i !== index);
-    setUsuarios(novaLista);
-  };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setNovoUsuario({
+            ...novoUsuario,
+            [e.target.name]: e.target.value,
+        });
+    };
 
-  return (
-    <div className="usuarios">
-      <h2>Gerenciamento de Usuários</h2>
+    const handleAdicionarUsuario = async () => {
+        const token = localStorage.getItem('jwtToken'); 
+        
+        if (!novoUsuario.name || !novoUsuario.email || !novoUsuario.cpf || !novoUsuario.password) {
+            alert("Nome, E-mail, CPF e Senha são obrigatórios para novo usuário.");
+            return;
+        }
 
-      <div className="form-usuario">
-        <input
-          type="text"
-          name="nome"
-          placeholder="Nome"
-          value={novoUsuario.nome}
-          onChange={handleChange}
-        />
-        <input
-          type="text"
-          name="cargo"
-          placeholder="Cargo"
-          value={novoUsuario.cargo}
-          onChange={handleChange}
-        />
-        <input
-          type="email"
-          name="email"
-          placeholder="E-mail"
-          value={novoUsuario.email}
-          onChange={handleChange}
-        />
-        <select name="nivel" value={novoUsuario.nivel} onChange={handleChange}>
-          <option value="Comum">Comum</option>
-          <option value="Admin">Admin</option>
-        </select>
-        <select name="status" value={novoUsuario.status} onChange={handleChange}>
-          <option value="Ativo">Ativo</option>
-          <option value="Inativo">Inativo</option>
-        </select>
+        try {
+            await axios.post(API_URL, novoUsuario, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert("Usuário adicionado com sucesso!");
+            
+            fetchUsers();
+            setNovoUsuario({ name: "", email: "", password: "", cpf: "", identifier: "" });
 
-        {editandoIndex !== null ? (
-          <button className="editar" onClick={salvarEdicao}>
-            Salvar Alterações
-          </button>
-        ) : (
-          <button className="adicionar" onClick={adicionarUsuario}>
-            Adicionar Usuário
-          </button>
-        )}
-      </div>
+        } catch (error: any) {
+            console.error('Erro na submissão:', error);
+            const msg = error.response?.data?.message || 'Falha na requisição.';
+            alert(`Erro: ${msg}`);
+        }
+    };
+    
+    const verDetalhes = (usuario: any) => {
+        navigate(`/detalhesUsuario/${usuario._id}`);  
+    };
 
-      <table>
-        <thead>
-          <tr>
-            <th>Nome</th>
-            <th>Cargo</th>
-            <th>Email</th>
-            <th>Nível</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {usuarios.map((usuario, index) => (
-            <tr key={index}>
-              <td>{usuario.nome}</td>
-              <td>{usuario.cargo}</td>
-              <td>{usuario.email}</td>
-              <td>{usuario.nivel}</td>
-              <td>{usuario.status}</td>
-              <td>
-                <button className="editar" onClick={() => editarUsuario(index)}>
-                  Editar
+    const removerUsuario = async (id: string, name: string) => {
+        const token = localStorage.getItem('jwtToken'); 
+        if (!token || !window.confirm(`Tem certeza que deseja remover ${name}?`)) return;
+
+        try {
+            await axios.delete(`${API_URL}/${id}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            alert(`Usuário ${name} removido com sucesso.`);
+            fetchUsers();
+        } catch (error) {
+            console.error('Erro ao remover:', error);
+            alert('Falha ao remover usuário.');
+        }
+    };
+
+
+    return (
+        <div className="usuarios">
+            <h2>Gerenciamento de Usuários</h2>
+
+            <div className="form-usuario">
+                <input
+                    type="text"
+                    name="name"
+                    placeholder="Nome Completo"
+                    value={novoUsuario.name}
+                    onChange={handleChange}
+                />
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="E-mail"
+                    value={novoUsuario.email}
+                    onChange={handleChange}
+                />
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Senha"
+                    value={novoUsuario.password}
+                    onChange={handleChange}
+                    required={true}
+                />
+                <input
+                    type="text"
+                    name="cpf"
+                    placeholder="CPF"
+                    value={novoUsuario.cpf}
+                    onChange={handleChange}
+                />
+                <input
+                    type="text"
+                    name="identifier"
+                    placeholder="Identificador/Cargo"
+                    value={novoUsuario.identifier}
+                    onChange={handleChange}
+                />
+                
+                <button className="adicionar" onClick={handleAdicionarUsuario}>
+                    Adicionar Usuário
                 </button>
-                <button className="remover" onClick={() => removerUsuario(index)}>
-                  Remover
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>E-mail</th>
+                        <th>CPF</th>
+                        <th>Identificador/Cargo</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {usuarios.map((usuario) => (
+                        <tr key={usuario._id}>
+                            <td>{usuario.name}</td>
+                            <td>{usuario.email}</td>
+                            <td>{usuario.cpf}</td>
+                            <td>{usuario.identifier}</td>
+                            <td>
+                                <button className="editar" onClick={() => verDetalhes(usuario)}>
+                                    Detalhes
+                                </button>
+                                <button className="remover" onClick={() => removerUsuario(usuario._id, usuario.name)}>
+                                    Remover
+                                </button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 };
 
 export default GerenciamentoUsuario;
